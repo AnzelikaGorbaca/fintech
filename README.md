@@ -6,7 +6,7 @@ performing transactions, and converting currencies using real-time exchange rate
 ## Exchange Rates API
 External API /latest endpoint is used for exchange rate retrieval.
 The endpoint returns exchange rate data in real-time for all available currencies or for a specific set.
-API Key for limited request amount is provided in the [application.properties](https://github.com/AnzelikaGorbaca/fintech/blob/master/financial-service/src/main/resources/application.properties) file
+Provide your API KEY to `exchange.rate.api=` in the [application.properties](https://github.com/AnzelikaGorbaca/fintech/blob/master/financial-service/src/main/resources/application.properties) file
 
 ## Main Technologies and Methods Used
 
