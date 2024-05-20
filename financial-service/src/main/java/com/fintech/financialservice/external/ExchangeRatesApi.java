@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,21 +28,18 @@ public class ExchangeRatesApi {
     private final RestTemplate restTemplate;
 
     @Cacheable(value = "exchangeRates", key = "#baseCurrency")
+    @Retryable(value = {ExchangeRatesApiException.class}, maxAttempts = 4, backoff = @Backoff(delay = 2000))
     public Map<String, BigDecimal> getExchangeRates(String baseCurrency) {
         log.info("Fetching exchange rates from external API. Base currency: {}", baseCurrency);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", exchangeRatesApiConfig.getApiKey());
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
+        final HttpEntity<String> entity = generateHeaders();
         final String url = buildUrl(baseCurrency);
 
         try {
-            ResponseEntity<ExchangeRateResponse> response = restTemplate.exchange(
-                    url, GET, entity, ExchangeRateResponse.class);
-            ExchangeRateResponse exchangeRateResponse = response.getBody();
+            ExchangeRateResponse exchangeRateResponse = restTemplate
+                    .exchange(url, GET, entity, ExchangeRateResponse.class).getBody();
 
-            if (exchangeRateResponse != null && exchangeRateResponse.isSuccess()) {
+            if (exchangeRatesResponseIsValid(exchangeRateResponse)) {
                 return exchangeRateResponse.getRates();
             } else {
                 log.error("Failed to fetch exchange rates, response: {}", exchangeRateResponse);
@@ -57,5 +55,17 @@ public class ExchangeRatesApi {
                 .queryParam("base", baseCurrency)
                 .queryParam("symbols", String.join(",", Currency.getSymbols()))
                 .toUriString();
+    }
+
+    private HttpEntity<String> generateHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("apikey", exchangeRatesApiConfig.getApiKey());
+        return new HttpEntity<>(headers);
+    }
+
+    private boolean exchangeRatesResponseIsValid(ExchangeRateResponse exchangeRateResponse) {
+        return (exchangeRateResponse != null && exchangeRateResponse.isSuccess()
+                && exchangeRateResponse.getRates() != null
+                && !exchangeRateResponse.getRates().isEmpty());
     }
 }

@@ -67,9 +67,9 @@ class CurrencyConversionServiceImplTest {
     }
 
     @Test
-    @DisplayName("Throw exception when exchange rates data is empty")
+    @DisplayName("Throw exception when exchange rates data is empty or null")
     void testConvertThrowsWhenExchangeRatesDataIsEmpty() {
-        BigDecimal amount =BigDecimal.valueOf(100);
+        BigDecimal amount = BigDecimal.valueOf(100);
 
         when(exchangeRatesApi.getExchangeRates(anyString())).thenReturn(new HashMap<>());
 

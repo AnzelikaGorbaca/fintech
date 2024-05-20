@@ -48,7 +48,7 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
     private Map<String, BigDecimal> getExchangeRates(Currency fromCurrency) {
         Map<String, BigDecimal> exchangeRates = exchangeRatesApi.getExchangeRates(fromCurrency.getSymbol());
 
-        if (exchangeRates == null || exchangeRates.isEmpty()) {
+        if (exchangeRates.isEmpty()) {
             throw new FinancialServiceException(
                     ErrorClassification.FINANCIALSERVICE_INTERNAL_SERVER_ERROR,
                     "Exchange rates data is empty or not available.");
