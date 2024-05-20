@@ -37,7 +37,7 @@ You can import this collection into Postman to interact with the API.
 1. Download and install [Postman](https://www.postman.com/downloads/).
 2. Open Postman and import the collection:
    - Click on `Import`.
-   - Choose the file `postman/Financial_Service_API_Collection.json` from this repository.
+   - Choose the [postman/Financial_Service_API_Collection.json](https://github.com/AnzelikaGorbaca/fintech/blob/master/financial-service/postman/Financial_Service_API_Collection.json) from this repository.
    - You should now see the collection in your Postman sidebar.
 
 ## Pre-configured SQL Data Script
